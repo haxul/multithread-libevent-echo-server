@@ -7,7 +7,7 @@ TARGET = build/server.o
 all: $(TARGET)
 
 $(TARGET): $(OBJS)
-	$(CC) $(OBJS) -o $@ $(LDFLAGS)
+	$(CC) $(OBJS) -g -o $@ $(LDFLAGS)
 
 clean:
 	rm -f $(TARGET)

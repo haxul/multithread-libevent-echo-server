@@ -178,7 +178,7 @@ void on_accept(int fd, short ev, void *arg) {
     int client_fd;
     struct sockaddr_in client_addr;
     socklen_t client_len = sizeof(client_addr);
-    workqueue_t *workqueue = (workqueue_t *)arg;
+    workqueue_t *workqueue = arg;
     client_t *client;
     job_t *job;
 
@@ -247,7 +247,7 @@ void on_accept(int fd, short ev, void *arg) {
      * object here.
      */
     if ((client->buf_ev = bufferevent_new(client_fd,
-                                buffered_on_read, buffered_on_write,
+                                buffered_on_read, NULL,
                                 buffered_on_error, client)) == NULL) {
         warn("client bufferevent creation failed");
         closeAndFreeClient(client);
@@ -263,7 +263,7 @@ void on_accept(int fd, short ev, void *arg) {
     bufferevent_enable(client->buf_ev, EV_READ);
 
     /* Create a job object and add it to the work queue. */
-    if ((job = malloc(sizeof(*job))) == NULL) {
+    if ((job = calloc(1, sizeof(*job))) == NULL) {
         warn("failed to allocate memory for job state");
         closeAndFreeClient(client);
         return;
@@ -329,7 +329,7 @@ int runServer(int port) {
         return 1;
     }
 
-    int nrhart = get_nprocs();
+    const int nrhart = get_nprocs();
     printf("This system has %d processors configured and "
             "%d processors available.\n",
             get_nprocs_conf(), get_nprocs());
